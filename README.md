@@ -63,6 +63,7 @@ As usual, your code will need to be linted and score 10/10 on Pylint.
 
 # Tips
 
+* Note that although Peewee will let you use *max_length*, SQLite will not truncate or raise an exception if you exceed the limit. You will either need to use constraints while defining fields that have such limitations (*constraints=[peewee.Check("LENGTH(user_id) < 30")]*) or check for those limits outside of Peewee (for example, by having your code check the size of the user ID that has been entered).
 * The *Users* and *UserStatus* classes may not be required anymore. You might be able to delete that code.
 * Remember tests run in alphabetical order, so *test_new_user* would run **after** *test_delete_user*, which could cause some issues.
 * Try to use unique names for your tables in the database, to avoid conflicts with your existing classes. For example, name them *UsersTable* and *StatusTable*.
