@@ -43,6 +43,7 @@ The following files need to be submitted:
 * *user_status.py*.
 * *users.py*.
 * *test_unit.py*.
+* *socialnetwork_model.py*.
 
 Any other files required by your implementation of this assignment.
 
