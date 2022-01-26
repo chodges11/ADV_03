@@ -12,24 +12,24 @@ https://github.com/ldconejo/social_network_generator
 
 # What you need to do
 
-1. Implement a SQL database that will contain both user account and well as user status data:
+1. Implement a SQL database using the PeeWee ORM that will contain both user account and well as user status data:
 
 * Implement your database model in a separate file, ``socialnetwork_model.py``
 
-* The database will have two tables: ``Users`` and *Status*.
+* The database will have two tables: ``Users`` and ``Status``.
 * The ``Users`` table will have the following fields:
     * user_id (Primary Key, limited to 30 characters).
     * user_name (Limited to 30 characters).
     * user_last_name (Limited to 100 characters).
     * user_email.
-* The *Status* table will have these fields:
+* The ``Status`` table will have these fields:
     * status_id (Primary Key).
     * user_id (Foreign Key from the ``Users`` table).
     * status_text.
 
 The fact that *UserID* will be a foreign key in the *Status* table means that you cannot add a status for a user that does not exist in the ``Users`` table.
 
-1. Modify ``UserStatusCollection`` to work with your new SQL database. This means that **every operation** (add, modify, delete, search) needs to interact with the database. This means no dumping the entire database into a dictionary!
+1. Modify ``UserCollection``  and ``UserStatusCollection`` to work with your new SQL database. This means that **every operation** (add, modify, delete, search) needs to interact with the database. This means no dumping the entire database into a dictionary!
 
 1. Update the feature to load the CSV files for users and user status to populate your SQL database. Remove the feature to save to CSV files, as the data will from now on be stored in your SQL database.
 
@@ -37,16 +37,22 @@ The fact that *UserID* will be a foreign key in the *Status* table means that yo
 
 1. Create unit testing for the code on ``users.py`` and ``user_status.py``. Test coverage should be at at 100% for each of the two files.
 
+1. Update your ``main.py`` (and ``test_main.py``) files to work with your new ``UserCollection`` and ``UserStatusCollection`` classes.
+
+**Note:** Anycode in main.py that worked directly with the ``.database`` dictionaries will need to be updated. On the plus side, you no longer need the code that dumps the csv files.
+
+
 # Submission #
 
 The following files need to be submitted:
 
-* ``main.py``.
-* ``menu.py``.
-* ``user_status.py``.
-* ``users.py``.
-* ``test_unit.py``.
-* ``socialnetwork_model.py``.
+* ``main.py``
+* ``test_main.py``
+* ``menu.py``
+* ``user_status.py``
+* ``users.py``
+* ``test_users.py``
+* ``socialnetwork_model.py``
 
 Any other files required by your implementation of this assignment.
 
@@ -89,4 +95,43 @@ database = SqliteDatabase(':memory:')
 
 * When implementing your database in memory for testing purposes, remember that the moment your close the connection, all your data and tables will be lost, so your tests will need to create those tables again. If using ``unittest``, you can use the ``setUp`` and ``tearDown`` for these purposes.
  If using ``pytest``, test fixtures work great as well.
+
+# Configuring the CI (gitHub actions)
+
+The CI is set up to lint, test, and check test coverage on your code.
+
+It may work by default, but you may need to make some changes to customize it for your specific project.
+
+### Adding requirements
+
+The CI should be set up with known requirements (e.g. peewee), but if you need other third-party pacakges, you can add them to the ``requirements.py`` file.
+
+### Configuring the coverage report
+
+Exactly how coverage is run can be configured by editing the ``.coveragerc`` file. See the coverage docs for details:
+
+https://coverage.readthedocs.io/en/6.3/config.html
+
+The most likely thing you will need to do is exclude files. For instance, if you don't have tests for the menu.py file, you can put this in .coveragerc:
+
+```
+# .coveragerc to control how coverage is run.
+[run]
+omit = menu.py
+```
+
+If you have more files to omit, then they can go on the next lines:
+
+```
+# .coveragerc to control how coverage is run.
+[run]
+omit = menu.py
+       users.py
+```
+ etc.
+
+ **Do not disable coverage for files that you are supposed to be testing!**
+
+
+
 
