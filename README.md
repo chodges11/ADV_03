@@ -39,7 +39,7 @@ The fact that *UserID* will be a foreign key in the *Status* table means that yo
 
 1. Update your ``main.py`` (and ``test_main.py``) files to work with your new ``UserCollection`` and ``UserStatusCollection`` classes.
 
-**Note:** Anycode in main.py that worked directly with the ``.database`` dictionaries will need to be updated. On the plus side, you no longer need the code that dumps the csv files.
+**Note:** Any code in main.py that worked directly with the ``.database`` dictionaries will need to be updated. On the plus side, you no longer need the code that dumps the csv files.
 
 
 # Submission #
