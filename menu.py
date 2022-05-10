@@ -32,9 +32,9 @@ def add_user():
     user_name = input('User name: ')
     user_last_name = input('User last name: ')
     if main.add_user(user_id,
-                     email,
                      user_name,
                      user_last_name,
+                     email
                      ):
         print("User was successfully added")
     else:
@@ -50,9 +50,9 @@ def update_user():
     user_name = input('User name: ')
     user_last_name = input('User last name: ')
     if main.update_user(user_id,
-                        email,
                         user_name,
-                        user_last_name
+                        user_last_name,
+                        email
                         ):
         print("User was successfully updated")
     else:
@@ -92,7 +92,7 @@ def add_status():
     status_id = input('Status ID: ')
     user_id = input('User ID: ')
     status_text = input('Status text: ')
-    if main.add_status(status_id, user_id, status_text, status_collection):
+    if main.add_status(status_id, user_id, status_text):
         print("New status was successfully added")
     else:
         print("An error occurred while trying to add new status")
@@ -105,7 +105,7 @@ def update_status():
     status_id = input('Status ID: ')
     user_id = input('User ID: ')
     status_text = input('Status text: ')
-    if main.update_status(status_id, user_id, status_text, status_collection):
+    if main.update_status(status_id, user_id, status_text):
         print("Status was successfully updated")
     else:
         print("An error occurred while trying to update status")
@@ -116,7 +116,7 @@ def search_status():
     Searches a status in the database
     """
     status_id = input('Enter status ID to search: ')
-    result = main.search_status(status_id, status_collection)
+    result = main.search_status(status_id)
     if result is None:
         print("ERROR: Status does not exist")
     else:
@@ -130,7 +130,7 @@ def delete_status():
     Deletes status from the database
     """
     status_id = input('Status ID: ')
-    if not main.delete_status(status_id, status_collection):
+    if not main.delete_status(status_id):
         print("An error occurred while trying to delete status")
     else:
         print("Status was successfully deleted")

@@ -171,26 +171,18 @@ def search_user(user_id):
 
 def add_status(status_id, user_id, status_text):
     """
-    Creates a new instance of UserStatus and stores it in
-    status_collection(which is an instance of UserStatusCollection)
-
-    Requirements:
-    - status_id cannot already exist in status_collection.
-    - Returns False if there are any errors (for example, if
-      user_collection.add_status() returns False).
-    - Otherwise, it returns True.
+    Creates a new Status record and stores it in the DB.
     """
     try:
         sm.db.connect()
-        new_user = sm.Users.create(
+        new_status = sm.Status.create(
             status_id=status_id,
             user_id=user_id,
-            user_last_name=user_last_name,
-            user_email=email,
+            status_text=status_text
         )
-        new_user.save()
+        new_status.save()
         sm.db.close()
-        logger.info('Add User')
+        logger.info('Add Status')
         return True
 
     except pw.PeeweeException as error:
@@ -198,45 +190,54 @@ def add_status(status_id, user_id, status_text):
         return False
 
 
-def update_status(status_id, user_id, status_text, status_collection):
+def update_status(status_id, user_id, status_text):
     """
-    Updates the values of an existing status_id
-
-    Requirements:
-    - Returns False if there are any errors.
-    - Otherwise, it returns True.
+    Updates the values of an existing status, in the DB.
     """
-    while status_collection.update_status(status_id,
-                                          user_id,
-                                          status_text
-                                          ):
+    try:
+        sm.db.connect()
+        status = sm.Status.get(sm.Status.status_id == status_id)
+        status.status_id = status_id
+        status.user_id = user_id
+        status.status_text = status_text
+        status.save()
+        sm.db.close()
+        logger.info('Update Status')
         return True
-    return False
+
+    except pw.PeeweeException as error:
+        logger.info(f"{type(error)}: {error}")
+        return False
 
 
-def delete_status(status_id, status_collection):
+def delete_status(status_id):
     """
-    Deletes a status_id from user_collection.
-
-    Requirements:
-    - Returns False if there are any errors (such as status_id not found)
-    - Otherwise, it returns True.
+    Deletes a status from the DB.
     """
-    while status_collection.delete_status(status_id):
+    try:
+        sm.db.connect()
+        status = sm.Status.get(sm.Status.status_id == status_id)
+        status.delete_instance()
+        sm.db.close()
+        logger.info('Delete Status')
         return True
-    return False
+
+    except pw.PeeweeException as error:
+        logger.info(f"{type(error)}: {error}")
+        return False
 
 
-def search_status(status_id, status_collection):
+def search_status(status_id):
     """
-    Searches for a status in status_collection
-
-    Requirements:
-    - If the status is found, returns the corresponding
-    UserStatus instance.
-    - Otherwise, it returns None.
+    Searches for a status in the DB.
     """
-    status_search_results = status_collection.search_status(status_id)
-    if status_search_results.status_id is not None:
-        return status_search_results
-    return None
+    try:
+        sm.db.connect()
+        status = sm.Status.get(sm.Status.status_id == status_id)
+        sm.db.close()
+        logger.info('Search status')
+        return status
+
+    except pw.PeeweeException as error:
+        logger.info(f"{type(error)}: {error}")
+        return None

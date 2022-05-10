@@ -3,6 +3,8 @@ Implement a SQL database, using the PeeWee ORM, that will contain both user
 account and well as user status data.
 """
 
+# pylint: disable=too-few-public-methods
+
 import os
 import peewee as pw
 from loguru import logger
@@ -15,11 +17,11 @@ db = pw.SqliteDatabase(FILE)
 
 
 class DBModel(pw.Model):
-    # TODO: DOCSTRING
+    """This model uses the PeeWee Model."""
     logger.info("Database class extending PeeWee Model.")
 
     class Meta:
-        # TODO: DOCSTRING
+        """Override the default name by specifying a table_name attribute."""
         database = db
 
 
