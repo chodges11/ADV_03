@@ -28,9 +28,9 @@ def add_user():
     Adds a new user into the database
     """
     user_id = input('User ID: ')
-    email = input('User email: ')
     user_name = input('User name: ')
     user_last_name = input('User last name: ')
+    email = input('User email: ')
     if main.add_user(user_id,
                      user_name,
                      user_last_name,
@@ -46,9 +46,9 @@ def update_user():
     Updates information for an existing user
     """
     user_id = input('User ID: ')
-    email = input('User email: ')
     user_name = input('User name: ')
     user_last_name = input('User last name: ')
+    email = input('User email: ')
     if main.update_user(user_id,
                         user_name,
                         user_last_name,
@@ -71,7 +71,7 @@ def search_user():
         print(f"User ID: {result.user_id}")
         print(f"Name: {result.user_name}")
         print(f"Last name: {result.user_last_name}")
-        print(f"Email: {result.email}")
+        print(f"Email: {result.user_email}")
 
 
 def delete_user():
