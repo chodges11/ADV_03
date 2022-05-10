@@ -6,6 +6,7 @@ main driver for a simple social network project
 # pylint:disable=unspecified-encoding
 
 import csv
+from loguru import logger
 import users as u
 import user_status as us
 import socialnetwork_model as sm
@@ -21,13 +22,12 @@ def init_collections():
         sm.Users,
         sm.Status
     ])
+    sm.db.close()
 
-
-def load_users(filename, user_collection):
+def load_users(filename):
     """
     Opens a CSV file with user data and
-    adds it to an existing instance of
-    UserCollection
+    adds it to a DB.
 
     Requirements:
     - If a user_id already exists, it
@@ -37,33 +37,40 @@ def load_users(filename, user_collection):
     (such as empty fields in the source CSV file)
     - Otherwise, it returns True.
     """
+    sm.db.connect()
+    users = []
     try:
         with open(filename, 'r') as read_obj:
-            csv_dict_reader = csv.DictReader(read_obj)
-            for row in csv_dict_reader:
-                user = u.Users(user_id=row["USER_ID"],
-                               email=row["EMAIL"],
-                               user_name=row["NAME"],
-                               user_last_name=row["LASTNAME"]
-                               )
-                if user.user_id in user_collection.database:
-                    continue
-                user_collection.add_user(user.user_id,
-                                         user.email,
-                                         user.user_name,
-                                         user.user_last_name
-                                         )
-        return True
+            reader = csv.DictReader(read_obj)
+            for row in reader:
+                users.append(row)
+
+        try:
+            for user in users:
+                with sm.db.transaction():
+                    new_user = sm.Users.create(
+                        user_id=user[0],
+                        user_name=user[1],
+                        user_last_name=user[2],
+                        user_email=user[3],
+                    )
+                    new_user.save()
+
+        except OSError as error:
+            logger.info(f"{type(error)}: {error}")
+            return False
 
     except OSError as error:
-        print(f"{type(error)}: {error}")
+        logger.info(f"{type(error)}: {error}")
         return False
 
+    sm.db.close()
+    return True
 
-def load_status_updates(filename, status_collection):
+
+def load_status_updates(filename):
     """
-    Opens a CSV file with status data and adds it to an existing
-    instance of UserStatusCollection
+    Opens a CSV file with status data and adds it to a DB.
 
     Requirements:
     - If a status_id already exists, it will ignore it and continue to
@@ -72,25 +79,34 @@ def load_status_updates(filename, status_collection):
       source CSV file)
     - Otherwise, it returns True.
     """
+    sm.db.connect()
+    status = []
     try:
         with open(filename, 'r') as read_obj:
-            csv_dict_reader = csv.DictReader(read_obj)
-            for row in csv_dict_reader:
-                user = us.UserStatus(status_id=row["STATUS_ID"],
-                                     user_id=row["USER_ID"],
-                                     status_text=row["STATUS_TEXT"],
-                                     )
-                if user.user_id in status_collection.database:
-                    continue
-                status_collection.add_status(user.status_id,
-                                             user.user_id,
-                                             user.status_text,
-                                             )
-        return True
+            reader = csv.DictReader(read_obj)
+            for row in reader:
+                status.append(row)
+
+        try:
+            for stat in status:
+                with sm.db.transaction():
+                    new_status = sm.Status.create(
+                        status_id=stat[0],
+                        user_id=stat[1],
+                        status_text=stat[2],
+                    )
+                    new_status.save()
+
+        except OSError as error:
+            logger.info(f"{type(error)}: {error}")
+            return False
 
     except OSError as error:
-        print(f"{type(error)}: {error}")
+        logger.info(f"{type(error)}: {error}")
         return False
+
+    sm.db.close()
+    return True
 
 
 def add_user(user_id, email, user_name, user_last_name, user_collection):

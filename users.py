@@ -29,7 +29,6 @@ class UserCollection():
     """
 
     def __init__(self):
-        self.database = {}
         logger.add(sys.stderr, format="{time} {level} {message}",
                    filter="my_module", level="INFO")
         logger.add("log_file.log")

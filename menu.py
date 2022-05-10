@@ -12,7 +12,7 @@ def load_users():
     Loads user accounts from a file
     """
     filename = input('Enter filename of user file: ')
-    main.load_users(filename, user_collection)
+    main.load_users(filename)
 
 
 def load_status_updates():
@@ -20,7 +20,7 @@ def load_status_updates():
     Loads status updates from a file
     """
     filename = input('Enter filename for status file: ')
-    main.load_status_updates(filename, status_collection)
+    main.load_status_updates(filename)
 
 
 def add_user():
@@ -35,7 +35,7 @@ def add_user():
                      email,
                      user_name,
                      user_last_name,
-                     user_collection):
+                     ):
         print("User was successfully added")
     else:
         print("An error occurred while trying to add new user")
