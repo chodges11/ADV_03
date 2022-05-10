@@ -12,11 +12,11 @@ class Users():
     Contains user information
     """
 
-    def __init__(self, user_id, email, user_name, user_last_name):
+    def __init__(self, user_id, user_name, user_last_name, email):
         self.user_id = user_id
-        self.email = email
         self.user_name = user_name
         self.user_last_name = user_last_name
+        self.email = email
         logger.add(sys.stderr, format="{time} {level} {message}",
                    filter="my_module", level="INFO")
         logger.add("log_file.log")

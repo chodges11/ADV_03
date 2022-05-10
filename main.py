@@ -24,6 +24,7 @@ def init_collections():
     ])
     sm.db.close()
 
+
 def load_users(filename):
     """
     Opens a CSV file with user data and
@@ -109,27 +110,23 @@ def load_status_updates(filename):
     return True
 
 
-def add_user(user_id, email, user_name, user_last_name, user_collection):
+def add_user(user_id, user_name, user_last_name, email,):
     """
-    Creates a new instance of User and stores it in user_collection
-    (which is an instance of UserCollection)
-
-    Requirements:
-    - user_id cannot already exist in user_collection.
-    - Returns False if there are any errors (for example, if
-      user_collection.add_user() returns False).
-    - Otherwise, it returns True.
+    Adds a new User to the database.
     """
-    while user_collection.add_user(user_id,
-                                   email,
-                                   user_name,
-                                   user_last_name
-                                   ):
-        return True
-    return False
+    sm.db.connect()
+    new_user = sm.Users.create(
+        user_id=user_id,
+        user_name=user_name,
+        user_last_name=user_last_name,
+        user_email=email,
+    )
+    new_user.save()
+    sm.db.close()
+    logger.info('Add User')
 
 
-def update_user(user_id, email, user_name, user_last_name, user_collection):
+def update_user(user_id, user_name, user_last_name, email):
     """
     Updates the values of an existing user
 
@@ -137,13 +134,16 @@ def update_user(user_id, email, user_name, user_last_name, user_collection):
     - Returns False if there are any errors.
     - Otherwise, it returns True.
     """
-    while user_collection.update_user(user_id,
-                                      email,
-                                      user_name,
-                                      user_last_name
-                                      ):
-        return True
-    return False
+    sm.db.connect()
+    new_user = sm.Users.create(
+        user_id=user_id,
+        user_name=user_name,
+        user_last_name=user_last_name,
+        user_email=email,
+    )
+    new_user.save()
+    sm.db.close()
+    logger.info('Add User')
 
 
 def delete_user(user_id, user_collection):
@@ -168,6 +168,8 @@ def search_user(user_id, user_collection):
     - If the user is found, returns the corresponding User instance.
     - Otherwise, it returns None.
     """
+
+    # grandma = Person.get(Person.name == 'Grandma L.')
     user_search_results = user_collection.search_user(user_id)
     if user_search_results.user_id is not None:
         return user_search_results
