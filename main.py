@@ -7,8 +7,7 @@ main driver for a simple social network project
 
 import csv
 from loguru import logger
-import users as u
-import user_status as us
+import peewee as pw
 import socialnetwork_model as sm
 
 
@@ -27,16 +26,7 @@ def init_collections():
 
 def load_users(filename):
     """
-    Opens a CSV file with user data and
-    adds it to a DB.
-
-    Requirements:
-    - If a user_id already exists, it
-    will ignore it and continue to the
-    next.
-    - Returns False if there are any errors
-    (such as empty fields in the source CSV file)
-    - Otherwise, it returns True.
+    Opens a CSV file with user data and adds it to a DB.
     """
     sm.db.connect()
     users = []
@@ -72,13 +62,6 @@ def load_users(filename):
 def load_status_updates(filename):
     """
     Opens a CSV file with status data and adds it to a DB.
-
-    Requirements:
-    - If a status_id already exists, it will ignore it and continue to
-      the next.
-    - Returns False if there are any errors(such as empty fields in the
-      source CSV file)
-    - Otherwise, it returns True.
     """
     sm.db.connect()
     status = []
@@ -114,70 +97,79 @@ def add_user(user_id, user_name, user_last_name, email,):
     """
     Adds a new User to the database.
     """
-    sm.db.connect()
-    new_user = sm.Users.create(
-        user_id=user_id,
-        user_name=user_name,
-        user_last_name=user_last_name,
-        user_email=email,
-    )
-    new_user.save()
-    sm.db.close()
-    logger.info('Add User')
+    try:
+        sm.db.connect()
+        new_user = sm.Users.create(
+            user_id=user_id,
+            user_name=user_name,
+            user_last_name=user_last_name,
+            user_email=email,
+        )
+        new_user.save()
+        sm.db.close()
+        logger.info('Add User')
+        return True
+
+    except pw.PeeweeException as error:
+        logger.info(f"{type(error)}: {error}")
+        return False
 
 
 def update_user(user_id, user_name, user_last_name, email):
     """
     Updates the values of an existing user
-
-    Requirements:
-    - Returns False if there are any errors.
-    - Otherwise, it returns True.
     """
-    sm.db.connect()
-    new_user = sm.Users.create(
-        user_id=user_id,
-        user_name=user_name,
-        user_last_name=user_last_name,
-        user_email=email,
-    )
-    new_user.save()
-    sm.db.close()
-    logger.info('Add User')
+    try:
+        sm.db.connect()
+        user = sm.Users.get(sm.Users.user_id == user_id)
+        user.user_id = user_id
+        user.user_name = user_name
+        user.user_last_name = user_last_name
+        user.user_email = email
+        user.save()
+        sm.db.close()
+        logger.info('Update User')
+        return True
+
+    except pw.PeeweeException as error:
+        logger.info(f"{type(error)}: {error}")
+        return False
 
 
-def delete_user(user_id, user_collection):
+def delete_user(user_id):
     """
     Deletes a user from user_collection.
-
-    Requirements:
-    - Returns False if there are any errors (such as user_id not found)
-    - Otherwise, it returns True.
     """
-    while user_collection.delete_user(user_id):
+    try:
+        sm.db.connect()
+        user = sm.Users.get(sm.Users.user_id == user_id)
+        user.delete_instance()
+        sm.db.close()
+        logger.info('Delete User')
         return True
-    return False
+
+    except pw.PeeweeException as error:
+        logger.info(f"{type(error)}: {error}")
+        return False
 
 
-def search_user(user_id, user_collection):
+def search_user(user_id):
     """
-    Searches for a user in user_collection(which is an instance of
-    UserCollection).
-
-    Requirements:
-    - If the user is found, returns the corresponding User instance.
-    - Otherwise, it returns None.
+    Searches for a user in the DB.
     """
+    try:
+        sm.db.connect()
+        user = sm.Users.get(sm.Users.user_id == user_id)
+        sm.db.close()
+        logger.info('Search User')
+        return user
 
-    # grandma = Person.get(Person.name == 'Grandma L.')
-    user_search_results = user_collection.search_user(user_id)
-    if user_search_results.user_id is not None:
-        return user_search_results
-
-    return None
+    except pw.PeeweeException as error:
+        logger.info(f"{type(error)}: {error}")
+        return None
 
 
-def add_status(status_id, user_id, status_text, status_collection):
+def add_status(status_id, user_id, status_text):
     """
     Creates a new instance of UserStatus and stores it in
     status_collection(which is an instance of UserStatusCollection)
@@ -188,16 +180,22 @@ def add_status(status_id, user_id, status_text, status_collection):
       user_collection.add_status() returns False).
     - Otherwise, it returns True.
     """
-    new_user_status = us.UserStatus(status_id,
-                                    user_id,
-                                    status_text
-                                    )
-    while status_collection.add_status(new_user_status.status_id,
-                                       new_user_status.user_id,
-                                       new_user_status.status_text
-                                       ):
+    try:
+        sm.db.connect()
+        new_user = sm.Users.create(
+            status_id=status_id,
+            user_id=user_id,
+            user_last_name=user_last_name,
+            user_email=email,
+        )
+        new_user.save()
+        sm.db.close()
+        logger.info('Add User')
         return True
-    return False
+
+    except pw.PeeweeException as error:
+        logger.info(f"{type(error)}: {error}")
+        return False
 
 
 def update_status(status_id, user_id, status_text, status_collection):

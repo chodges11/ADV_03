@@ -52,8 +52,8 @@ def update_user():
     if main.update_user(user_id,
                         email,
                         user_name,
-                        user_last_name,
-                        user_collection):
+                        user_last_name
+                        ):
         print("User was successfully updated")
     else:
         print("An error occurred while trying to update user")
@@ -64,14 +64,14 @@ def search_user():
     Searches a user in the database
     """
     user_id = input('Enter user ID to search: ')
-    result = main.search_user(user_id, user_collection)
+    result = main.search_user(user_id)
     if result is None:
         print("ERROR: User does not exist")
     else:
         print(f"User ID: {result.user_id}")
-        print(f"Email: {result.email}")
         print(f"Name: {result.user_name}")
         print(f"Last name: {result.user_last_name}")
+        print(f"Email: {result.email}")
 
 
 def delete_user():
@@ -79,7 +79,7 @@ def delete_user():
     Deletes user from the database
     """
     user_id = input('User ID: ')
-    if not main.delete_user(user_id, user_collection):
+    if not main.delete_user(user_id):
         print("An error occurred while trying to delete user")
     else:
         print("User was successfully deleted")

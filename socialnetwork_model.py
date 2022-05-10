@@ -32,7 +32,7 @@ class Users(DBModel):
     user_id = pw.CharField(primary_key=True, max_length=30)
     user_name = pw.CharField(max_length=30)
     user_last_name = pw.CharField(max_length=100)
-    user_email = pw.CharField(max_length=100)
+    user_email = pw.CharField(max_length=100, null=True)
 
 
 class Status(DBModel):
@@ -43,4 +43,4 @@ class Status(DBModel):
     logger.info("Status")
     status_id = pw.CharField(primary_key=True)
     user_id = pw.ForeignKeyField(Users, null=False)
-    status_text = pw.CharField()
+    status_text = pw.CharField(null=True)
