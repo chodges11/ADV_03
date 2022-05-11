@@ -49,16 +49,12 @@ def load_users(filename):
                     new_user.save()
 
         except pw.PeeweeException as error:
-            sm.db.close()
             logger.info(f"{type(error)}: {error}")
             return False
 
     except pw.PeeweeException as error:
-        sm.db.close()
         logger.info(f"{type(error)}: {error}")
         return False
-
-    sm.db.close()
     logger.info("End Load Users")
     return True
 
@@ -87,16 +83,13 @@ def load_status_updates(filename):
                     new_status.save()
 
         except pw.PeeweeException as error:
-            sm.db.close()
             logger.info(f"{type(error)}: {error}")
             return False
 
     except pw.PeeweeException as error:
-        sm.db.close()
         logger.info(f"{type(error)}: {error}")
         return False
 
-    sm.db.close()
     logger.info("End Load Status")
     return True
 
@@ -106,20 +99,19 @@ def add_user(user_id, user_name, user_last_name, email):
     Adds a new User to the database.
     """
     try:
-        sm.db.connect(reuse_if_open=True)
-        new_user = sm.Users.create(
-            user_id=user_id,
-            user_name=user_name,
-            user_last_name=user_last_name,
-            user_email=email
-        )
-        new_user.save()
-        sm.db.close()
-        logger.info('Add User')
-        return True
+        with sm.db:
+            sm.db.connect(reuse_if_open=True)
+            new_user = sm.Users.create(
+                user_id=user_id,
+                user_name=user_name,
+                user_last_name=user_last_name,
+                user_email=email
+            )
+            new_user.save()
+            logger.info('Add User')
+            return True
 
     except pw.PeeweeException as error:
-        sm.db.close()
         logger.info(f"{type(error)}: {error}")
         return False
 
@@ -129,19 +121,18 @@ def update_user(user_id, user_name, user_last_name, email):
     Updates the values of an existing user
     """
     try:
-        sm.db.connect(reuse_if_open=True)
-        user = sm.Users.get(sm.Users.user_id == user_id)
-        user.user_id = user_id
-        user.user_name = user_name
-        user.user_last_name = user_last_name
-        user.user_email = email
-        user.save()
-        sm.db.close()
-        logger.info('Update User')
-        return True
+        with sm.db:
+            sm.db.connect(reuse_if_open=True)
+            user = sm.Users.get(sm.Users.user_id == user_id)
+            user.user_id = user_id
+            user.user_name = user_name
+            user.user_last_name = user_last_name
+            user.user_email = email
+            user.save()
+            logger.info('Update User')
+            return True
 
     except pw.DoesNotExist as error:
-        sm.db.close()
         logger.info(f"{type(error)}: {error}")
         return False
 
@@ -151,15 +142,14 @@ def delete_user(user_id):
     Deletes a user from user_collection.
     """
     try:
-        sm.db.connect(reuse_if_open=True)
-        user = sm.Users.get(sm.Users.user_id == user_id)
-        user.delete_instance()
-        sm.db.close()
-        logger.info('Delete User')
-        return True
+        with sm.db:
+            sm.db.connect(reuse_if_open=True)
+            user = sm.Users.get(sm.Users.user_id == user_id)
+            user.delete_instance()
+            logger.info('Delete User')
+            return True
 
     except pw.DoesNotExist as error:
-        sm.db.close()
         logger.info(f"{type(error)}: {error}")
         return False
 
@@ -169,14 +159,13 @@ def search_user(user_id):
     Searches for a user in the DB.
     """
     try:
-        sm.db.connect(reuse_if_open=True)
-        user = sm.Users.get(sm.Users.user_id == user_id)
-        sm.db.close()
-        logger.info('Search User')
-        return user
+        with sm.db:
+            sm.db.connect(reuse_if_open=True)
+            user = sm.Users.get(sm.Users.user_id == user_id)
+            logger.info('Search User')
+            return user
 
     except pw.DoesNotExist as error:
-        sm.db.close()
         logger.info(f"{type(error)}: {error}")
         return None
 
@@ -186,22 +175,21 @@ def add_status(status_id, user_id, status_text):
     Creates a new Status record and stores it in the DB.
     """
     try:
-        sm.db.connect(reuse_if_open=True)
-        if user_id not in sm.Users:
-            print("User not found. Please add the User first.")
-            return False
-        new_status = sm.Status.create(
-            status_id=status_id,
-            user_id=user_id,
-            status_text=status_text
-        )
-        new_status.save()
-        sm.db.close()
-        logger.info('Add Status')
-        return True
+        with sm.db:
+            sm.db.connect(reuse_if_open=True)
+            if user_id not in sm.Users:
+                print("User not found. Please add the User first.")
+                return False
+            new_status = sm.Status.create(
+                status_id=status_id,
+                user_id=user_id,
+                status_text=status_text
+            )
+            new_status.save()
+            logger.info('Add Status')
+            return True
 
     except pw.PeeweeException as error:
-        sm.db.close()
         logger.info(f"{type(error)}: {error}")
         return False
 
@@ -211,18 +199,17 @@ def update_status(status_id, user_id, status_text):
     Updates the values of an existing status, in the DB.
     """
     try:
-        sm.db.connect(reuse_if_open=True)
-        status = sm.Status.get(sm.Status.status_id == status_id)
-        status.status_id = status_id
-        status.user_id = user_id
-        status.status_text = status_text
-        status.save()
-        sm.db.close()
-        logger.info('Update Status')
-        return True
+        with sm.db:
+            sm.db.connect(reuse_if_open=True)
+            status = sm.Status.get(sm.Status.status_id == status_id)
+            status.status_id = status_id
+            status.user_id = user_id
+            status.status_text = status_text
+            status.save()
+            logger.info('Update Status')
+            return True
 
     except pw.DoesNotExist as error:
-        sm.db.close()
         logger.info(f"{type(error)}: {error}")
         return False
 
@@ -232,15 +219,14 @@ def delete_status(status_id):
     Deletes a status from the DB.
     """
     try:
-        sm.db.connect(reuse_if_open=True)
-        status = sm.Status.get(sm.Status.status_id == status_id)
-        status.delete_instance()
-        sm.db.close()
-        logger.info('Delete Status')
-        return True
+        with sm.db:
+            sm.db.connect(reuse_if_open=True)
+            status = sm.Status.get(sm.Status.status_id == status_id)
+            status.delete_instance()
+            logger.info('Delete Status')
+            return True
 
     except pw.DoesNotExist as error:
-        sm.db.close()
         logger.info(f"{type(error)}: {error}")
         return False
 
@@ -250,13 +236,12 @@ def search_status(status_id):
     Searches for a status in the DB.
     """
     try:
-        sm.db.connect(reuse_if_open=True)
-        status = sm.Status.get(sm.Status.status_id == status_id)
-        sm.db.close()
-        logger.info('Search status')
-        return status
+        with sm.db:
+            sm.db.connect(reuse_if_open=True)
+            status = sm.Status.get(sm.Status.status_id == status_id)
+            logger.info('Search status')
+            return status
 
     except pw.DoesNotExist as error:
-        sm.db.close()
         logger.info(f"{type(error)}: {error}")
         return None
