@@ -169,6 +169,8 @@ def search_user(user_id):
         logger.info(f"{type(error)}: {error}")
         return None
 
+# pylint: disable=unsupported-membership-test
+
 
 def add_status(status_id, user_id, status_text):
     """
