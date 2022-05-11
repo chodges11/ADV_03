@@ -120,8 +120,8 @@ def search_status():
     if result is None:
         print("ERROR: Status does not exist")
     else:
-        print(f"User ID: {result.user_id}")
-        print(f"Status ID: {result.status_id}")
+        print(f"User ID: {result.status_id}")
+        print(f"Status ID: {result.user_id}")
         print(f"Status text: {result.status_text}")
 
 
@@ -166,10 +166,10 @@ if __name__ == '__main__':
                             D: Update user
                             E: Search user
                             F: Delete user
-                            H: Add status
-                            I: Update status
-                            J: Search status
-                            K: Delete status
+                            G: Add status
+                            H: Update status
+                            I: Search status
+                            J: Delete status
                             Q: Quit
 
                             Please enter your choice: """)

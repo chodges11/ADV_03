@@ -37,9 +37,9 @@ def load_users(filename):
             for row in reader:
                 users.append(row)
 
-        for user in users:
-            try:
-                with sm.db.transaction():
+        try:
+            with sm.db.atomic():
+                for user in users:
                     new_user = sm.Users.create(
                         user_id=user['USER_ID'],
                         user_name=user['NAME'],
@@ -48,10 +48,10 @@ def load_users(filename):
                     )
                     new_user.save()
 
-            except pw.PeeweeException as error:
-                sm.db.close()
-                logger.info(f"{type(error)}: {error}")
-                return False
+        except pw.PeeweeException as error:
+            sm.db.close()
+            logger.info(f"{type(error)}: {error}")
+            return False
 
     except pw.PeeweeException as error:
         sm.db.close()
@@ -77,8 +77,8 @@ def load_status_updates(filename):
                 status.append(row)
 
         try:
-            for stat in status:
-                with sm.db.atomic():
+            with sm.db.atomic():
+                for stat in status:
                     new_status = sm.Status.create(
                         status_id=stat['STATUS_ID'],
                         user_id=stat['USER_ID'],
@@ -106,7 +106,7 @@ def add_user(user_id, user_name, user_last_name, email):
     Adds a new User to the database.
     """
     try:
-        sm.db.connect()
+        sm.db.connect(reuse_if_open=True)
         new_user = sm.Users.create(
             user_id=user_id,
             user_name=user_name,
@@ -129,7 +129,7 @@ def update_user(user_id, user_name, user_last_name, email):
     Updates the values of an existing user
     """
     try:
-        sm.db.connect()
+        sm.db.connect(reuse_if_open=True)
         user = sm.Users.get(sm.Users.user_id == user_id)
         user.user_id = user_id
         user.user_name = user_name
@@ -151,7 +151,7 @@ def delete_user(user_id):
     Deletes a user from user_collection.
     """
     try:
-        sm.db.connect()
+        sm.db.connect(reuse_if_open=True)
         user = sm.Users.get(sm.Users.user_id == user_id)
         user.delete_instance()
         sm.db.close()
@@ -169,7 +169,7 @@ def search_user(user_id):
     Searches for a user in the DB.
     """
     try:
-        sm.db.connect()
+        sm.db.connect(reuse_if_open=True)
         user = sm.Users.get(sm.Users.user_id == user_id)
         sm.db.close()
         logger.info('Search User')
@@ -186,7 +186,10 @@ def add_status(status_id, user_id, status_text):
     Creates a new Status record and stores it in the DB.
     """
     try:
-        sm.db.connect()
+        sm.db.connect(reuse_if_open=True)
+        if user_id not in sm.Users:
+            print("User not found. Please add the User first.")
+            return False
         new_status = sm.Status.create(
             status_id=status_id,
             user_id=user_id,
@@ -208,7 +211,7 @@ def update_status(status_id, user_id, status_text):
     Updates the values of an existing status, in the DB.
     """
     try:
-        sm.db.connect()
+        sm.db.connect(reuse_if_open=True)
         status = sm.Status.get(sm.Status.status_id == status_id)
         status.status_id = status_id
         status.user_id = user_id
@@ -229,7 +232,7 @@ def delete_status(status_id):
     Deletes a status from the DB.
     """
     try:
-        sm.db.connect()
+        sm.db.connect(reuse_if_open=True)
         status = sm.Status.get(sm.Status.status_id == status_id)
         status.delete_instance()
         sm.db.close()
@@ -247,7 +250,7 @@ def search_status(status_id):
     Searches for a status in the DB.
     """
     try:
-        sm.db.connect()
+        sm.db.connect(reuse_if_open=True)
         status = sm.Status.get(sm.Status.status_id == status_id)
         sm.db.close()
         logger.info('Search status')
